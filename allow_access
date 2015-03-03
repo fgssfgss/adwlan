@@ -1,0 +1,10 @@
+#!/bin/sh
+
+if [ ! "$1" ]; then
+        exit 0
+fi
+
+# 4 is position before main rule of redirect
+iptables -t nat -I PREROUTING 4 -s $1 -i br-lan -p tcp --dport 80 -j ACCEPT
+iptables -I FORWARD 1 -i br-lan -s $1 -j ACCEPT
+

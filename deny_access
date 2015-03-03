@@ -1,0 +1,13 @@
+#!/bin/sh
+
+if [ "$1" != "add" ]; then
+	exit 0
+fi
+
+if [ ! "$2" ]; then
+	exit 0
+fi
+
+iptables -t nat -A PREROUTING -p tcp --dport 80 --source $2 -j REDIRECT --to-port 8888
+iptables -A FORWARD -s $2 -j DROP
+

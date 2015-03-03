@@ -1,0 +1,28 @@
+#!/bin/sh /etc/rc.common
+
+START=46
+
+start () {
+        . /etc/functions.sh
+        include /lib/network
+        scan_interfaces
+
+        echo "Setting up new rules"
+	# 10.0.0.1 ip of router, for luci access
+        iptables -t nat -A PREROUTING -i br-lan -p tcp -d 10.0.0.1 --dport 80 -j ACCEPT
+        iptables -t nat -A PREROUTING -i br-lan -p tcp --dport 80 -j REDIRECT --to-port 8888
+
+        iptables -F FORWARD
+        iptables -A FORWARD -j DROP
+
+        echo "Run adwlan daemon script"
+        service_start /usr/bin/adwlan.lua
+}
+
+stop () {
+        echo "Clearing rules"
+        #iptables -t nat -F PREROUTING
+
+	service_stop /usr/bin/adwlan.lua
+}
+
